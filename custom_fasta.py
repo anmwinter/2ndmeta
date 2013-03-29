@@ -22,13 +22,13 @@ def custom_fasta(fasta_file):
     for seq_record in SeqIO.parse(fasta_file,"fasta"):
 
 #r is a regular expression. Here I am searching for a white space (\s) followed
-#by some combination of letters and numbers which is the genus
-        genus_name = extract(seq_record.description, r'\s\w+')
+#by some combination of letters which is the genus name
+        genus_name = extract(seq_record.description, r'\s\w+\s\w+')
 
 #r is a regular expression. Here I am searching for a some number of capital
 #letters and underscore [A-Z_] plus some numbers \d+, followed by a period,
 #and some numbers \d+. This will give you the accession number
-        acc_num = extract(seq_record.description, r'[A-Z_]+\d+.\d+')
+        acc_num = extract(seq_record.description, r'\s[A-Z_]+\d+.\d+')
         genus = str(genus_name)
         
         
@@ -77,5 +77,5 @@ def extract(src, pattern):
 
 
 
-custom_fasta("fungi.fasta")
+custom_fasta("knight_gg.fasta")
 
