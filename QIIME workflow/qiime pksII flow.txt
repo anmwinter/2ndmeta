@@ -1,0 +1,14 @@
+split_libraries.py -b variable_length -l 350 -L 500 -s 20 -m ksa_mapping.csv -f AB_KSa.fasta,AZ_KSa.fasta,UT_KSa.fasta -q AB_KSa.qual,AZ_KSa.qual,UT_KSa.qual -o split_library_output/
+
+pick_otus.py -i split_library_output/seqs.fna -m uclust_ref -r pksII_85.fasta -s 0.95
+
+pick_rep_set.py -i uclust_ref_picked_otus/seqs_otus.txt -f split_library_output/seqs.fna -o rep_set.fna
+
+assign_taxonomy.py -i rep_set.fna -t pksII_85_taxonomy.txt -r pksII_85.fasta -o taxonomy_results/ --uclust_similarity 0.85
+
+make_otu_table.py -i uclust_ref_picked_otus/seqs_otus.txt -t taxonomy_results/rep_set_tax_assignments.txt -o otu_table.biom
+
+summarize_taxa.py -i otu_table.biom  -o taxonomy_summaries/
+
+plot_taxa_summary.py -i taxonomy_summaries/otu_table_L2.txt -o taxonomy_plot_L2/
+
