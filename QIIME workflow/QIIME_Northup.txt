@@ -1,0 +1,152 @@
+QIIME - BACTERIA
+
+For 1.8.0
+
+WE START HERE
+
+MrDNA sends you three files. .qual, .fna, and (mapping).txt . 
+
+TRIMMING OUT SHORT AND LONG SEQUENCES
+
+This says we have barcodes length 8 (-b 8) and we only want sequences between 200 (-l 200) - 500 (-L 500) bp long.
+
+split_libraries.py -b 8 -l 200 -L 500 -s 30 -m VLmapping.txt -f VL.fna -q VL.qual -o split_library_output/
+
+MERGING MULTIPLE 454 DATA SETS IN QIIME WITH NO REPEAT BARCODES
+
+!!! You must create a single mapping file that has all the sample IDs and metadata you want to analyze !!!
+
+split_libraries.py -b 8 -l 200 -L 500 -s 30 -m VLmapping.txt -f VL1.fasta,VL2.fasta -q VL1.qual,VL2.qual -o split_library_output/
+
+Scot already denoised the samples so we skip this part and call the fasta file from the split_library_output/
+
+MERGING 454 DATASETS WITH REPEAT BAROCDES
+
+!!! You must create a single mapping file that has all the sample IDs and metadata you want to analyze !!!
+
+split_libraries.py -b 8 -l 200 -L 500 -s 30 -m VL1.txt -f VL1.fna -q VL1.qual -o split_library_output_VL1/
+
+split_libraries.py -b 8 -l 200 -L 500 -s 30 -m VL2.txt -f VL2.fna -q VL2.qual -o split_library_output_VL2/
+
+Make a new folder split_library_output
+
+Move seqs_VL1.fna and seqs_VL2.fna into split_library_output
+
+cat seqs_VL1.fna seqs_VL2.fna > seqs.fna
+
+PICKING OTUS (97%)
+
+pick_otus.py -s 0.97 -i split_library_output/seqs.fna 
+
+pick_rep_set.py -i uclust_picked_otus/seqs_otus.txt -f split_library_output/seqs.fna -o rep_set.fna
+
+ASSIGNING TAXONOMY
+
+assign_taxonomy.py -i rep_set.fna -o taxonomy_results/
+
+make_otu_table.py -i uclust_picked_otus/seqs_otus.txt -t taxonomy_results/rep_set_tax_assignments.txt -o otu_table.biom
+
+ADDING METADATA TO YOUR BIOM FILE
+
+biom add-metadata -i otu_table.biom -o rich_otu_table.biom --sample-metadata-fp VLmapping.csv 
+
+convert_biom.py -i otu_table.biom -o otu_table_tabseparated.txt -b --header_key taxonomy --output_metadata_id "Consensus Lineage" 
+
+SORT and FILTER BIOM FILES
+
+filter_samples_from_otu_table.py -i otu_table.biom -o filtered_otu_table.biom --sample_id_fp keep_id_list.txt
+
+sort_otu_table.py -i filtered_otu_table.biom -o sort_filtered_otu_table.biom -l keep_id_list.txt
+
+SUMMARIZE TAXONOMY IN TERMS OF RELATIVE ABUNDANCE USE THIS ONLY IF YOU SORT AND FILTERED YOUR DATA
+
+summarize_taxa.py -i sort_otu_table.biom  -o taxonomy_summaries/ -a
+
+IF YOU SKIP THE SORT FILTER STEPS USE THIS
+
+summarize_taxa.py -i otu_table.biom  -o taxonomy_summaries/ -a
+
+PLOT DIVERSITY CHARTS
+This lets us look at different taxa levels L2 (phyla) through L6 (genus) in terms of relative abundance
+
+plot_taxa_summary.py -i taxonomy_summaries/otu_table_L2.txt -o taxonomy_plot_L2/
+(Phyla level)
+
+plot_taxa_summary.py -i taxonomy_summaries/otu_table_L3.txt -o taxonomy_plot_L3/
+(Class level)
+
+plot_taxa_summary.py -i taxonomy_summaries/otu_table_L6.txt -o taxonomy_plot_L6/
+(fake species level)
+
+For our lab replot in R or excel and split out the proteobacteria 
+
+ALIGNMENT AND TREES
+
+align_seqs.py -i rep_set.fna -o alignment/
+
+filter_alignment.py -i alignment/rep_set_aligned.fasta -o alignment/
+
+make_phylogeny.py -i alignment/rep_set_aligned_pfiltered.fasta -o rep_set_tree.tre
+
+ALPHA DIVERSITY INDICES WITHOUT RAREFRACTION
+
+alpha_diversity.py -i out_table.biom -o alpha_indices.txt -t rep_set_tree.tre -m observed_species,chao1,PD_whole_tree,shannon,goods_coverage
+
+*Fancier and more acuarate way to calculate coverage then good's
+conditional_uncovered_probability.py -i otu_table.biom -o cup.txt
+
+AT THIS POINT YOU HAVE THE GOODS COVERAGE AND CUP FOR YOUR DATASET. YOU CAN MOVE TO PHYLOSEQ OR CONTINUE IN QIIME
+
+NOTE
+***Rarefaction is when you sample without replacement at many different sequencing depths. (multiple_rarefactions.py) This is what is used for alpha diversity, and this is statistically valid.
+
+CALCULATING ALPHA DIVERSITY WITH RAREFACTION (diversity within a sample)
+
+multiple_rarefactions.py -i otu_table.biom -m 10 -x 4600 -s 250 -n 10 -o rarefied_otu_tables/
+-m should either be 1 or 10 which is the minimum number of samples and x comes from your mean sample count in the split_library_log file
+-n should be 50 but it's time consuming
+
+alpha_diversity.py -i rarefied_otu_tables/ -o alpha_rare/ -t rep_set_tree.tre -m observed_species,chao1,PD_whole_tree,shannon,goods_coverage
+
+collate_alpha.py -i alpha_rare/ -o alpha_collated/
+
+make_rarefaction_plots.py -i alpha_collated/ -m lavabeds_mapping.csv
+
+BETA DIVERISTY
+***Rarefying is when you down-sample every sample to an even sequencing depth. (single_rarefaction.py) This is how the qiime devs normalize for sampling depth, and this is not statistically valid. Removing data reduces your ability to detect differences between populations. So use your .biom file and read into phyloseq for beta diversity analysis. 
+
+
+CALCULATES DISSIMILARTY MATRICES ON WEIGHTED UNIFRAC STATS USING UNRAREFYIED 
+### unweighted look at how taxa dissappear 
+### to many variables and uneveness for weighted 
+### more conservative way to go, methodolgically sound
+
+jackknifed_beta_diversity.py -i otu_table.biom -o jackknifed_beta_diversity/ -e 90 -m combined_mapping.txt -t rep_set_tree.tre -p qiime_parameters.txt
+
+###Look at confidence values from the jackknife 
+
+dissimilarity_mtx_stats.py -i jackknifed_beta_diversity/unweighted_unifrac/rare_dm/ -o unweighted_unifrac_stats/
+
+make_distance_boxplots.py -m lavabeds_parameters.txt -o distance_boxplots -d unweighted_unifrac_stats/means.txt -f Site -o Distance_Plots -n 999
+
+beta_diversity_through_plots.py -i sort_otu_table.biom -o color_by_all_fields/ -t rep_set_tree.tre -m caveomly_lb_parameters.txt -e 100 --color_by_all_fields -f
+
+CORE MICROBIOM
+
+This will calculate the core microbiom defined as the OTUs that are present in at least 50% (0.5) of the samples
+
+compute_core_microbiome.py --min_fraction_for_core 0.5 -i sort_otu_table.biom -o otu_table_core
+
+convert_biom.py -i otu_table_core/core_table_50.biom -o otu_table_core/otu_core50_table_tabseparated.txt -b --header_key taxonomy --output_metadata_id "Consensus Lineage"
+
+summarize_taxa.py -i otu_table_core/core_table_50.biom -o otu_table_core/tax_sum_50/
+
+plot_taxa_summary.py -i otu_table_core/tax_sum_50/core_table_50_L2.txt -o otu_table_core/taxonomy_plot_L2/
+
+ANOVA 
+
+ANOVA Analysis Using Environ Parameters
+otu_category_significance.py -i otu_table_no_singletons.biom -m lavabeds_parameters.txt -s ANOVA -c Age -o anova_out/
+
+JACKKNIFE BY ALL CATEGORIES
+beta_diversity_through_plots.py -i sort_otu_table.biom -o color_by_all_fields/ -t rep_set_tree.tre -m caveomly_lb_parameters.txt -e 100 --color_by_all_fields -f
