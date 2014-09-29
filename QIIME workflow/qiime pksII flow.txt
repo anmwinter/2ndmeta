@@ -1,3 +1,7 @@
+QIIME for polyketide synthase type II alpha reads from 454 data
+You will need a custom library of PKS II sequences
+
+
 split_libraries.py -b variable_length -l 350 -L 500 -s 20 -m ksa_mapping.csv -f AB_KSa.fasta,AZ_KSa.fasta,UT_KSa.fasta -q AB_KSa.qual,AZ_KSa.qual,UT_KSa.qual -o split_library_output/
 
 pick_otus.py -i split_library_output/seqs.fna -m uclust_ref -r pksII_85.fasta -s 0.95
@@ -12,3 +16,4 @@ summarize_taxa.py -i otu_table.biom  -o taxonomy_summaries/
 
 plot_taxa_summary.py -i taxonomy_summaries/otu_table_L2.txt -o taxonomy_plot_L2/
 
+CC-BY

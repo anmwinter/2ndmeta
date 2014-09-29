@@ -150,3 +150,5 @@ otu_category_significance.py -i otu_table_no_singletons.biom -m lavabeds_paramet
 
 JACKKNIFE BY ALL CATEGORIES
 beta_diversity_through_plots.py -i sort_otu_table.biom -o color_by_all_fields/ -t rep_set_tree.tre -m caveomly_lb_parameters.txt -e 100 --color_by_all_fields -f
+
+CC-BY
