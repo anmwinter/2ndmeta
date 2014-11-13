@@ -82,7 +82,7 @@ For our lab replot in R or excel and split out the proteobacteria
 
 ALIGNMENT AND TREES
 
-align_seqs.py -i rep_set.fna -o alignment/
+align_seqs.py -i rep_set.fna -m pynast -o alignment/
 
 filter_alignment.py -i alignment/rep_set_aligned.fasta -o alignment/
 

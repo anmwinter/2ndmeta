@@ -1,0 +1,10 @@
+Check total number of reads in fastq file
+
+head yourfastqfile.fastq
+
+Copy a portion of the header and then use grep
+
+grep -c 'somepartoftheheader'
+
+This will give you a count of the number of sequences. Do this for both the F and R. 
+
