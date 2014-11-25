@@ -1,0 +1,17 @@
+
+Open Access Siderophore Database
+
+2014/11/20
+Siderophores are secondary metabolites (small molecules) that bacteria use for catching metals. These siderophores then make their way back to the bacteria for use in metabolism. They have uses in bioremediation (cleaning up toxic sites), novel drugs for humans. I want to look at ecologic roles and evolutionary history. Currently we are lacking an open access siderophore database that is linked to the underlying genetics. 
+
+I suspect that the presense of siderophore genes follows a similar pattern to the rest of the secondary metabolites. See 
+Peter Cimermancic, Marnix H. Medema, Jan Claesen, Kenji Kurita, Laura C. Wieland Brown, Konstantinos Mavrommatis, Amrita Pati, Paul A. Godfrey, Michael Koehrsen, Jon Clardy, Bruce W. Birren, Eriko Takano, Andrej Sali, Roger G. Linington, Michael A. Fischbach, Insights into Secondary Metabolism from a Global Analysis of Prokaryotic Biosynthetic Gene Clusters, Cell, Volume 158, Issue 2, 17 July 2014, Pages 412-421, http://dx.doi.org/10.1016/j.cell.2014.06.034.
+
+Methods
+I started out by downloading all the siderophores mentioned in the siderophore database. However these are not connected to the NCBI database. So I switch gears and did a seach here:
+http://www.ncbi.nlm.nih.gov/nuccore
+SEARCH: siderophore AND bacteria[organism] NOT genome AND cluster 
+This says look for siderophire in bacteria that's not a genome and is also a gene cluster
+200 hits
+For each cluster record the bacterial species, compound if known, accession number, download the fasta, and then the coding region fasta. Both as nucleotide codes. This makes it easier for GC content, codon usage, and tetranucleotide freq calculations down the road. 
+

@@ -1,0 +1,10 @@
+QIIME 1.8.0 - BACTERIA
+
+TRIMMING OUT SHORT AND LONG SEQUENCES AND QUALITY FILTERING
+
+This says we have barcodes length 8 (-b 8) and we only want sequences between 200 (-l 200) - 500 (-L 500) bp long.
+
+split_libraries.py -b 8 -l 200 -L 500 -s 30 -m VLmapping.txt -f VL.fna -q VL.qual -o split_library_output/
+
+PROCESS FLOWGRAMS
+process_sff.py -i cry.sff -f -o cry_processed_sff

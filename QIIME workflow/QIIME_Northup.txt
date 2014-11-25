@@ -97,40 +97,6 @@ conditional_uncovered_probability.py -i otu_table.biom -o cup.txt
 
 AT THIS POINT YOU HAVE THE GOODS COVERAGE AND CUP FOR YOUR DATASET. YOU CAN MOVE TO PHYLOSEQ OR CONTINUE IN QIIME
 
-NOTE
-***Rarefaction is when you sample without replacement at many different sequencing depths. (multiple_rarefactions.py) This is what is used for alpha diversity, and this is statistically valid.
-
-CALCULATING ALPHA DIVERSITY WITH RAREFACTION (diversity within a sample)
-
-multiple_rarefactions.py -i otu_table.biom -m 10 -x 4600 -s 250 -n 10 -o rarefied_otu_tables/
--m should either be 1 or 10 which is the minimum number of samples and x comes from your mean sample count in the split_library_log file
--n should be 50 but it's time consuming
-
-alpha_diversity.py -i rarefied_otu_tables/ -o alpha_rare/ -t rep_set_tree.tre -m observed_species,chao1,PD_whole_tree,shannon,goods_coverage
-
-collate_alpha.py -i alpha_rare/ -o alpha_collated/
-
-make_rarefaction_plots.py -i alpha_collated/ -m lavabeds_mapping.csv
-
-BETA DIVERISTY
-***Rarefying is when you down-sample every sample to an even sequencing depth. (single_rarefaction.py) This is how the qiime devs normalize for sampling depth, and this is not statistically valid. Removing data reduces your ability to detect differences between populations. So use your .biom file and read into phyloseq for beta diversity analysis. 
-
-
-CALCULATES DISSIMILARTY MATRICES ON WEIGHTED UNIFRAC STATS USING UNRAREFYIED 
-### unweighted look at how taxa dissappear 
-### to many variables and uneveness for weighted 
-### more conservative way to go, methodolgically sound
-
-jackknifed_beta_diversity.py -i otu_table.biom -o jackknifed_beta_diversity/ -e 90 -m combined_mapping.txt -t rep_set_tree.tre -p qiime_parameters.txt
-
-###Look at confidence values from the jackknife 
-
-dissimilarity_mtx_stats.py -i jackknifed_beta_diversity/unweighted_unifrac/rare_dm/ -o unweighted_unifrac_stats/
-
-make_distance_boxplots.py -m lavabeds_parameters.txt -o distance_boxplots -d unweighted_unifrac_stats/means.txt -f Site -o Distance_Plots -n 999
-
-beta_diversity_through_plots.py -i sort_otu_table.biom -o color_by_all_fields/ -t rep_set_tree.tre -m caveomly_lb_parameters.txt -e 100 --color_by_all_fields -f
-
 CORE MICROBIOM
 
 This will calculate the core microbiom defined as the OTUs that are present in at least 50% (0.5) of the samples
@@ -150,5 +116,8 @@ otu_category_significance.py -i otu_table_no_singletons.biom -m lavabeds_paramet
 
 JACKKNIFE BY ALL CATEGORIES
 beta_diversity_through_plots.py -i sort_otu_table.biom -o color_by_all_fields/ -t rep_set_tree.tre -m caveomly_lb_parameters.txt -e 100 --color_by_all_fields -f
+
+supervised_learning.py -i otu_table.biom -m mapping_8_18_14.csv -c SUBREGION -o ml_cv10 -e cv10
+
 
 CC-BY

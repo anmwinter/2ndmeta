@@ -4,7 +4,19 @@ head yourfastqfile.fastq
 
 Copy a portion of the header and then use grep
 
-grep -c 'somepartoftheheader'
+grep -c 'somepartoftheheader' yourF.fastq
+
+grep -c 'somepartoftheheader' yourR.fastq
 
 This will give you a count of the number of sequences. Do this for both the F and R. 
+
+Join the F and R pairs in QIIME
+
+join_paired_ends.py
+
+grep -c 'somepartoftheheader' yourJOINED.fastq
+
+See how many didn't match up and calculate a percent loss
+
+add_qiime_labels.p
 
