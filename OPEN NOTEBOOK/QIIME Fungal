@@ -1,0 +1,30 @@
+QIIME Fungal
+
+ITS evolution about x1000 faster
+Evolves differently in different lin
+non coding, transcribe, but spliced out
+maintanecne to 2nd structure
+Indel evolution -> can align within a family
+Indels mess up alignment
+
+18S SSU -> ITS1 -> 5.8 -> ITS2 -> LSU
+
+454 target ITS1 
+(ITS1F and ITS2) don't use
+
+ITS1F 30 bp up from end of 18S SSU
+ITS4 sits in the LSU
+
+In the SSU, intron splice site, near the end. It comes and go.
+
+
+QIIME Fungal (ITS barcoding paper)
+
+quality score 30
+pick_otus - 97% - uclust (single linkage clustering, multiple linkage clustering)
+clustering - uclust
+
+
+
+
+

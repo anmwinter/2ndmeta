@@ -1,0 +1,50 @@
+PARALLEL QIIME - BACTERIA 
+
+You will need to create this file in your home directory. But only once!!!
+
+# qiime_config
+# WARNING: DO NOT EDIT OR DELETE Qiime/qiime_config
+# To overwrite defaults, copy this file to $HOME/.qiime_config or a full path
+# specified by $QIIME_CONFIG_FP and edit that copy of the file.
+# This version was made by Jeff on 20140103 and stored at /macqiime/configs/qiime_config.txt
+
+cluster_jobs_fp	/macqiime/QIIME/bin/start_parallel_jobs.py
+python_exe_fp	/macqiime/bin/python
+blastmat_dir
+blastall_fp blastall
+pynast_template_alignment_fp	/macqiime/greengenes/core_set_aligned.fasta.imputed
+pynast_template_alignment_blastdb
+template_alignment_lanemask_fp	/macqiime/greengenes/lanemask_in_1s_and_0s
+jobs_to_start	1
+seconds_to_sleep	60
+qiime_scripts_dir	/macqiime/QIIME/bin/
+denoiser_min_per_core	50
+cloud_environment	False
+topiaryexplorer_project_dir
+torque_queue	friendlyq
+assign_taxonomy_reference_seqs_fp	/macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta
+assign_taxonomy_id_to_taxonomy_fp	/macqiime/greengenes/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt
+
+# I'm not sure if working_dir is still used or if temp_dir is used now in a cluster application, 
+# but you'd be best off using the same directory and thinking of these as synonymous.
+# You may want to set this if you have a multiple disks / machines / cluster application
+# (e.g. a common mounted folder on all nodes via some kind of NAS). 
+temp_dir	/tmp/
+working_dir	/tmp/
+
+
+Save this as .qiime_config. Make sure the cluster_jobs_fp points to where your start_parallel_jobs.py is located at. 
+Mine .qiime_config files is located in /Users/arakooser/
+
+
+TRIMMING OUT SHORT AND LONG SEQUENCES
+
+This says we have barcodes length 8 (-b 8) and we only want sequences between 200 (-l 200) - 500 (-L 500) bp long.
+
+split_libraries.py -b 8 -l 200 -L 500 -s 30 -m VLmapping.txt -f VL.fna -q VL.qual -o split_library_output/
+
+PICKING OTUS (97%)
+
+parallel_pick_otus_uclust_ref.py -i split_library_out -r /macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta -o para_test/ -O 2 
+
+pick_rep_set.py -i uclust_picked_otus/seqs_otus.txt -f split_library_output/seqs.fna -o rep_set.fna
