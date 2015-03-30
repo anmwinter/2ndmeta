@@ -1,0 +1,44 @@
+QIIME 1.8 - FOR 454 data - BACTERIA
+
+BEFORE YOU START
+If you don't know much about what a command line is or what QIIME is, STOP. This is not for you.
+Follow these two links:
+http://people.duke.edu/~ccc14/pcfb/intro.html (Practical Computing for Biologists)
+and then here
+http://qiime.org/tutorials/tutorial.html
+
+Then start here:
+
+split_libraries.py -b 8 -l 200 -L 600 -s 30 -m FMD_mapping.csv -f FMD.fasta -q FMD.qual -o split_library_output/
+
+#Creates a fasta, qual, and sff.txt file for denoising and further processing
+
+process_sff.py -i sffs/test.sff -f
+
+denoiser.py -i 454Reads.sff.txt -f split_library_output/seqs.fna -v -o denoiser_out -c -n 4
+
+inflate_denoiser_output.py -c denoiser_out/centroids.fna -s denoiser_out/singletons.fna -f split_library_output/seqs.fna -d denoiser_mapping.txt -o denoised_seqs.fna
+
+identify_chimeric_seqs.py -i seqs.fna -m usearch61 -o usearch_checked_chimeras/ -r gg_97_otus_4feb2011.fasta
+
+filter_fasta.py -f seqs.fna -o seqs_chimeras_filtered.fna -s usearch_checked_chimeras/chimeras.txt -n
+
+
+PICKING OTUS (97%)
+
+pick_otus.py -s 0.97 -i your_denoised_chimera_checked.fasta -m uclust
+
+In your case replace the -i with your denoised fasta that we found the other day. This creates clusters of OTUs. I would recommend starting with uclust and then later on try cd-hit or possible usearch depending on your data set. This command with create a uclust_picked_otus folder with several files inside. To pick the representative set (for assigning taxonomy later) you will want the seqs_otus.txt. 
+
+pick_rep_set.py -i uclust_picked_otus/seqs_otus.txt -f our_denoised_chimera_checked.fasta -o rep_set.fna -m first
+
+Here replace the -f with your denoised fasta file. This will dump out a representative set for the taxonomic assignment. 
+
+assign_taxonomy.py -i rep_set.fna -o taxonomy_results/ -m uclust
+
+make_otu_table.py -i uclust_picked_otus/seqs_otus.txt -t taxonomy_results/rep_set_tax_assignments.txt -o otu_table.biom 
+
+summarize_taxa.py -i otu_table.biom  -o taxonomy_summaries_rdp/ -a
+
+
+

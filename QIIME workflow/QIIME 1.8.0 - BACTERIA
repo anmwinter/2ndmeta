@@ -1,4 +1,4 @@
-QIIME 1.8.0 - BACTERIA
+QIIME 1.8.0 - FUNGI
 
 TRIMMING OUT SHORT AND LONG SEQUENCES AND QUALITY FILTERING
 
@@ -8,3 +8,4 @@ split_libraries.py -b 8 -l 200 -L 500 -s 30 -m VLmapping.txt -f VL.fna -q VL.qua
 
 PROCESS FLOWGRAMS
 process_sff.py -i cry.sff -f -o cry_processed_sff
+
